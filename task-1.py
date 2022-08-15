@@ -44,17 +44,58 @@ print(get_shop_list_by_dishes(['Омлет', 'Фахитос'], 2))
 import os
 
 
+class Txt:
+	def __init__(self, name, lines, content):
+		self.name = name
+		self.lines = lines
+		self.content = content
+
+	def __lt__(self, other):
+		return self.lines < other.lines
+
+	def __eq__(self, other):
+		return self.lines == other.lines
+
+	def __le__(self, other):
+		return self.lines <= other.lines
+
+	def __str__(self):
+		return f'Lines: {self.lines}'
+
+
 def all_in_one(folder):
 	files = os.listdir(path=folder)
-	txts = {}
+	files.sort()
+	txts = []
 	for file in files:
 		with open(f'sorted/{file}', encoding='utf-8') as txt:
-			files_content = txt.readlines()
-			txts[file] = [len(files_content), ''.join(files_content).strip('\n')]
-	txts = dict(sorted(txts.items(), key=lambda item: item[1][0]))
-	for k, v in txts.items():
-		with open('new.txt', 'a', encoding='utf-8') as result:
-			result.write(f'{k}\n{v[0]}\n{v[1]}\n')
+			files_len = len(txt.readlines())
+			txt.seek(0)
+			files_content = txt.read().strip('\n')
+			if txt:
+				file = Txt(file, files_len, files_content)
+				txts.append(file)
+
+	txts.sort(key=lambda self: self.lines)
+	with open('result.txt', 'w', encoding='utf-8') as result:
+		for txt in txts:
+			result.write(f'{txt.name}\n{txt.lines}\n{txt.content}\n')
+
+	return 'Done'
 
 
-all_in_one('sorted')
+print(all_in_one('sorted'))
+
+# or...
+
+# def all_in_one(folder):
+# 	files = os.listdir(path=folder)
+# 	txts = {}
+# 	for file in files:
+# 		with open(f'sorted/{file}', encoding='utf-8') as txt:
+# 			files_content = txt.readlines()
+# 			txts[file] = [len(files_content), ''.join(files_content).strip('\n')]
+# 	txts = dict(sorted(txts.items(), key=lambda item: item[1][0]))
+# 	for k, v in txts.items():
+# 		with open('new.txt', 'a', encoding='utf-8') as result:
+# 			result.write(f'{k}\n{v[0]}\n{v[1]}\n')
